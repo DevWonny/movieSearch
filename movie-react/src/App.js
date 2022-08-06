@@ -1,24 +1,20 @@
-import logo from './logo.svg';
 import './App.css';
-import NaverMovieAPI from './api/NaverMovieAPI';
-import { useEffect } from 'react';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import Main from './view/Main';
+import Detail from './view/Detail';
+import Search from './view/Search';
+import Loading from './components/common/Loading';
 
 function App() {
-  useEffect(() => {
-    NaverMovieAPI();
-  }, []);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a className="App-link" href="https://reactjs.org" target="_blank" rel="noopener noreferrer">
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Main />} />
+        <Route path="/detail" element={<Detail />} />
+        <Route path="/search" element={<Search />} />
+        <Route path="/loading" element={<Loading />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

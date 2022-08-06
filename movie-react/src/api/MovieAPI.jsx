@@ -1,8 +1,7 @@
 import axios from 'axios';
 
 const MovieAPI = async () => {
-  const key = process.env.REACT_APP_MOVIE_KEY;
-  console.log('key: ', key);
+  const key = '9644078c3d03b7e1e02b018fcf38050e';
 
   try {
     const res = await axios.get(
