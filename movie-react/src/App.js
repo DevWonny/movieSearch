@@ -1,15 +1,12 @@
 import logo from './logo.svg';
 import './App.css';
-import { useEffect } from 'react';
 import NaverMovieAPI from './api/NaverMovieAPI';
-import MovieAPI from './api/MovieAPI';
+import { useEffect } from 'react';
 
 function App() {
   useEffect(() => {
-    MovieAPI();
-    NaverMovieAPI('아이언 맨');
+    NaverMovieAPI();
   }, []);
-
   return (
     <div className="App">
       <header className="App-header">
