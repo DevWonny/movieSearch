@@ -4,6 +4,7 @@ import Main from './view/Main';
 import Detail from './view/Detail';
 import Search from './view/Search';
 import Loading from './components/common/Loading';
+import Footer from './components/common/Footer';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/search" element={<Search />} />
         <Route path="/loading" element={<Loading />} />
       </Routes>
+      <Footer />
     </BrowserRouter>
   );
 }
