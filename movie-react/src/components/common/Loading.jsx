@@ -4,8 +4,8 @@ import styled from 'styled-components';
 const Loading = ({ text }) => {
   return (
     <LoadingContainer>
-      <TailSpin width={80} height={80} color="#F2E9CF" />
-      <LoadingText>{text ? text : 'Loading...'}</LoadingText>
+      <TailSpin width={80} height={80} color="#CEE9B6" />
+      <LoadingText>{text ? text : '로딩 중...'}</LoadingText>
     </LoadingContainer>
   );
 };
@@ -17,7 +17,7 @@ const LoadingContainer = styled.div`
   width: 100%;
   height: 100vh;
   overflow: hidden;
-  background: #162719;
+  background: #2d8d79;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -29,7 +29,7 @@ const LoadingText = styled.p`
   position: relative;
   top: 10px;
   text-align: center;
-  font-size: 20px;
-  font-weight: 700;
-  color: #f2e8cf;
+  font-size: 30px;
+  /* font-weight: 700; */
+  color: #cee9b6;
 `;

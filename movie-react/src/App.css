@@ -1,5 +1,12 @@
+@import './assets/font/font.css';
+
 .App {
   text-align: center;
+}
+
+body,
+html {
+  font-family: 'BMHANNAAir';
 }
 
 .App-logo {
