@@ -25,9 +25,9 @@ export default Footer;
 const FooterContainer = styled.div`
   width: 100%;
   height: 100px;
-  position: absolute;
+  position: fixed;
   bottom: 0;
-  border-top: 1px solid #cee9b6;
+  border-top: 2px solid #cee9b6;
   background: #8fc79a;
   color: #2d8d79;
   font-weight: bold;
@@ -35,4 +35,5 @@ const FooterContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  box-sizing: border-box;
 `;

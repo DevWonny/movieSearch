@@ -13,6 +13,7 @@ function App() {
         <Route path="/" element={<Main />} />
         <Route path="/detail" element={<Detail />} />
         <Route path="/search" element={<Search />} />
+        {/* loadgin page는 추후 제거될 예정 -> loading은 api 호출 시에만 화면에 표시 될 예정 */}
         <Route path="/loading" element={<Loading />} />
       </Routes>
       <Footer />
