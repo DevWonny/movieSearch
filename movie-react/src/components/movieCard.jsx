@@ -7,11 +7,11 @@ import styled from 'styled-components';
 const MovieCard = () => {
   return (
     <Card.Container>
-      <Card.Poster></Card.Poster>
+      <Card.Poster>Poster</Card.Poster>
       <Card.ContentContainer>
-        <Card.Title>제목</Card.Title>
-        <Card.Grade>평점</Card.Grade>
-        <Card.DirectorActor>감독 및 출연</Card.DirectorActor>
+        <Card.EtcDiv>제목</Card.EtcDiv>
+        <Card.EtcDiv>평점</Card.EtcDiv>
+        <Card.EtcDiv>감독 및 출연</Card.EtcDiv>
         <Card.Introduction>소개글</Card.Introduction>
         <Card.Detail>더보기</Card.Detail>
       </Card.ContentContainer>
@@ -25,7 +25,7 @@ export default MovieCard;
 const Card = {
   Container: styled.div`
     width: 80%;
-    height: 200px;
+    height: 250px;
     border: 1px solid #cee9b6;
     border-radius: 5px;
     margin-top: 10px;
@@ -37,7 +37,7 @@ const Card = {
   `,
 
   Poster: styled.div`
-    width: 150px;
+    width: 180px;
     height: 100%;
     border: 1px solid black;
     box-sizing: border-box;
@@ -46,32 +46,23 @@ const Card = {
   ContentContainer: styled.div`
     width: 80%;
     height: 100%;
-    /* background-color: aqua; */
     position: relative;
   `,
-
-  Title: styled.div`
+  EtcDiv: styled.div`
     width: 100%;
-    height: 15px;
-    background-color: red;
-  `,
-
-  Grade: styled.div`
-    width: 100%;
-    height: 15px;
-    background-color: blue;
-  `,
-
-  DirectorActor: styled.div`
-    width: 100%;
-    height: 15px;
-    background-color: yellow;
+    height: 30px;
+    line-height: 30px;
+    margin-bottom: 10px;
+    color: #8fc79a;
   `,
 
   Introduction: styled.div`
     width: 100%;
-    height: 15px;
-    background-color: green;
+    height: 80px;
+    line-height: 1.5;
+    color: #8fc79a;
+    overflow: hidden;
+    margin-bottom: 10px;
   `,
 
   Detail: styled.div`
