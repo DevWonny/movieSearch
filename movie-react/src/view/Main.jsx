@@ -1,20 +1,38 @@
 // react
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 // style
 import styled from 'styled-components';
 
 // component
 import MovieCard from '../components/MovieCard';
+// api
+import NaverMovieAPI from '../api/NaverMovieAPI';
 
 const Main = () => {
+  // 영화 목록
+  const [movieList, setMoiveList] = useState([]);
+  // api 호출
+  const naverMovieApi = async () => {
+    const res = await NaverMovieAPI();
+
+    setMoiveList(res.data.items);
+  };
+
+  useEffect(() => {
+    naverMovieApi();
+  }, []);
+
   return (
     <MainContainer>
       <MainHeader>
         <SearchBar placeholder="검색어를 입력해주세요." />
       </MainHeader>
+      {movieList.length > 0 &&
+        movieList.map((el, index) => {
+          return <MovieCard key={`Main-movie-card-${index}`} el={el} />;
+        })}
       {/* Component */}
-      <MovieCard />
     </MainContainer>
   );
 };

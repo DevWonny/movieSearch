@@ -6,7 +6,7 @@ const NaverMovieAPI = async () => {
     'X-Naver-Client-Secret': '1QALDriLde',
   };
   const res = await axios.get(`/v1/search/movie.json?query=아이언 맨`, { headers });
-  console.log('res', res);
+  return res;
 };
 
 export default NaverMovieAPI;

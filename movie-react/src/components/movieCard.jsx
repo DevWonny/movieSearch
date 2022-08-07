@@ -4,14 +4,20 @@ import React from 'react';
 // style
 import styled from 'styled-components';
 
-const MovieCard = () => {
+const MovieCard = (props) => {
+  console.log('props', props.el);
   return (
     <Card.Container>
-      <Card.Poster>Poster</Card.Poster>
+      <Card.Poster>
+        <Card.Image src={props.el.image} />
+      </Card.Poster>
       <Card.ContentContainer>
-        <Card.EtcDiv>제목</Card.EtcDiv>
-        <Card.EtcDiv>평점</Card.EtcDiv>
-        <Card.EtcDiv>감독 및 출연</Card.EtcDiv>
+        <Card.EtcDiv>{props.el.title.replaceAll('<b>', '').replaceAll('</b>', '')}</Card.EtcDiv>
+        <Card.EtcDiv>{props.el.userRating}</Card.EtcDiv>
+        <Card.EtcDiv>
+          {props.el.director}
+          {props.el.actor}
+        </Card.EtcDiv>
         <Card.Introduction>소개글</Card.Introduction>
         <Card.Detail>더보기</Card.Detail>
       </Card.ContentContainer>
@@ -39,7 +45,11 @@ const Card = {
   Poster: styled.div`
     width: 180px;
     height: 100%;
-    border: 1px solid black;
+  `,
+  Image: styled.img`
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
     box-sizing: border-box;
   `,
 
