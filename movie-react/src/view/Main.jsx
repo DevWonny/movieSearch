@@ -19,6 +19,9 @@ const Main = () => {
   // lading
   const [isLoading, setIsLoading] = useState(false);
 
+  // scrollTop
+  const [targetScrollTop, setTargetScrollTop] = useState(null);
+
   // main Container Ref
   const mainContainerRef = useRef();
 
@@ -33,12 +36,17 @@ const Main = () => {
     }
   };
 
+  const handler = (e) => {
+    const target = e.target;
+    setTargetScrollTop(target.scrollTop);
+  };
+
   useEffect(() => {
     naverMovieApi();
   }, []);
 
   return (
-    <MainContainer ref={mainContainerRef} className="scrollTop">
+    <MainContainer ref={mainContainerRef} className="scrollTop" onScroll={handler}>
       <MainHeader>
         <Link to="/serach" className="search-bar">
           검색어를 입력해주세요.
@@ -52,7 +60,7 @@ const Main = () => {
         })}
 
       {/* Top Button */}
-      <TopButton mainContainerRef={mainContainerRef} />
+      {targetScrollTop > 200 && <TopButton mainContainerRef={mainContainerRef} />}
 
       {/* loading page */}
       {isLoading && <Loading text="영화 목록을 불러오는 중입니다..." />}
