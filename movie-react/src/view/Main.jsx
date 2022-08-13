@@ -1,22 +1,36 @@
-// react
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 
-// style
+import { Link } from 'react-router-dom';
+
 import styled from 'styled-components';
 
-// component
 import MovieCard from '../components/MovieCard';
-// api
+
 import NaverMovieAPI from '../api/NaverMovieAPI';
+
+import SearchIcon from '../assets/icon/serachIcon.svg';
+import TopButton from '../components/common/TopButton';
+import Loading from '../components/common/Loading';
 
 const Main = () => {
   // 영화 목록
   const [movieList, setMoiveList] = useState([]);
+
+  // lading
+  const [isLoading, setIsLoading] = useState(false);
+
+  // main Container Ref
+  const mainContainerRef = useRef();
+
   // api 호출
   const naverMovieApi = async () => {
+    setIsLoading(true);
     const res = await NaverMovieAPI();
 
-    setMoiveList(res.data.items);
+    if (res) {
+      setIsLoading(false);
+      setMoiveList(res.data.items);
+    }
   };
 
   useEffect(() => {
@@ -24,15 +38,24 @@ const Main = () => {
   }, []);
 
   return (
-    <MainContainer>
+    <MainContainer ref={mainContainerRef} className="scrollTop">
       <MainHeader>
-        <SearchBar placeholder="검색어를 입력해주세요." />
+        <Link to="/serach" className="search-bar">
+          검색어를 입력해주세요.
+          <img src={SearchIcon} alt="searchIcon" />
+        </Link>
       </MainHeader>
+      {/* Component */}
       {movieList.length > 0 &&
         movieList.map((el, index) => {
           return <MovieCard key={`Main-movie-card-${index}`} el={el} />;
         })}
-      {/* Component */}
+
+      {/* Top Button */}
+      <TopButton mainContainerRef={mainContainerRef} />
+
+      {/* loading page */}
+      {isLoading && <Loading text="영화 목록을 불러오는 중입니다..." />}
     </MainContainer>
   );
 };
@@ -43,10 +66,15 @@ export default Main;
 const MainContainer = styled.div`
   width: 100%;
   height: calc(100vh - 202px);
-  overflow: auto;
+  overflow: scroll;
   background-color: #2d8d79;
   padding: 101px 0;
   position: relative;
+
+  // scroll dispaly hidden
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 const MainHeader = styled.div`
@@ -61,18 +89,24 @@ const MainHeader = styled.div`
   justify-content: center;
   align-items: center;
   z-index: 9;
-`;
 
-const SearchBar = styled.input`
-  width: 50%;
-  height: 40px;
-  outline: none;
-  padding: 0 10px;
-  color: #cee9b6;
-  background-color: transparent;
-  border: 1px solid #cee9b6;
-  border-radius: 10px;
-  &::placeholder {
+  & .search-bar {
+    width: 50%;
+    height: 40px;
+    padding: 0 10px;
     color: #cee9b6;
+    background-color: transparent;
+    border: 1px solid #cee9b6;
+    border-radius: 10px;
+    cursor: pointer;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    & img {
+      width: 30px;
+      height: 30px;
+    }
   }
 `;
