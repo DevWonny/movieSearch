@@ -1,4 +1,4 @@
-# 영화 소개 페이지 제작
+# 영화 검색 페이지 제작
 
 ## 목적 : infinite scroll에 적응하기(observer pattern 활용)
 
