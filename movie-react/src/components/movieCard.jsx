@@ -1,26 +1,42 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import styled from 'styled-components';
 
 const MovieCard = (props) => {
+  const navigate = useNavigate();
+  const [movieTitle, setMovieTitle] = useState('');
+
+  useEffect(() => {
+    setMovieTitle(props.el.title.replaceAll('<b>', '').replaceAll('</b>', '').replaceAll('&amp;', '&'));
+  }, []);
+  // 더보기 클릭시 상세 페이지로 이동
+  const onDetailClick = () => {
+    navigate(`/detail/${movieTitle}`, {
+      state: { poster: props.el.image, Date: props.el.pubDate, rating: props.el.userRating },
+    });
+  };
   return (
     <Card.Container>
       <Card.Poster>
         <Card.Image src={props.el.image} />
       </Card.Poster>
       <Card.ContentContainer>
-        <Card.EtcDiv>{props.el.title.replaceAll('<b>', '').replaceAll('</b>', '')}</Card.EtcDiv>
+        <Card.EtcDiv>{movieTitle && movieTitle}</Card.EtcDiv>
+        <Card.EtcDiv>{props.el.pubDate}</Card.EtcDiv>
         <Card.EtcDiv>{props.el.userRating}</Card.EtcDiv>
         <Card.EtcDiv>
           {props.el.director}
           {props.el.actor}
         </Card.EtcDiv>
-        <Card.Introduction>소개글</Card.Introduction>
-        <Link to="/detail" className="Detail">
+        <div
+          className="Detail"
+          onClick={() => {
+            onDetailClick();
+          }}>
           더보기
-        </Link>
+        </div>
       </Card.ContentContainer>
     </Card.Container>
   );
