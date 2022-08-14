@@ -1,10 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 
-import { Link } from 'react-router-dom';
-
 import styled from 'styled-components';
 
-import MovieCard from '../components/MovieCard';
+import MovieCard from '../components/movieCard';
 
 import NaverMovieAPI from '../api/NaverMovieAPI';
 
@@ -22,13 +20,16 @@ const Main = () => {
   // scrollTop
   const [targetScrollTop, setTargetScrollTop] = useState(null);
 
+  // 영화 제목
+  const [movieTitle, setMovieTitle] = useState('');
+
   // main Container Ref
   const mainContainerRef = useRef();
 
   // api 호출
   const naverMovieApi = async () => {
     setIsLoading(true);
-    const res = await NaverMovieAPI();
+    const res = await NaverMovieAPI({ query: movieTitle });
 
     if (res) {
       setIsLoading(false);
@@ -41,23 +42,35 @@ const Main = () => {
     setTargetScrollTop(target.scrollTop);
   };
 
-  useEffect(() => {
-    naverMovieApi();
-  }, []);
-
   return (
     <MainContainer ref={mainContainerRef} className="scrollTop" onScroll={handler}>
       <MainHeader>
-        <Link to="/serach" className="search-bar">
-          검색어를 입력해주세요.
+        <SearchInput
+          type="text"
+          placeholder="검색어를 입력해주세요."
+          id="search"
+          value={movieTitle}
+          onChange={(e) => {
+            setMovieTitle(e.target.value);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              naverMovieApi();
+            }
+          }}
+        />
+        <SearchIconDiv onClick={() => naverMovieApi()}>
           <img src={SearchIcon} alt="searchIcon" />
-        </Link>
+        </SearchIconDiv>
       </MainHeader>
       {/* Component */}
-      {movieList.length > 0 &&
+      {movieList.length > 0 ? (
         movieList.map((el, index) => {
           return <MovieCard key={`Main-movie-card-${index}`} el={el} />;
-        })}
+        })
+      ) : (
+        <NonList>영화를 검색해주세요!</NonList>
+      )}
 
       {/* Top Button */}
       {targetScrollTop > 200 && <TopButton mainContainerRef={mainContainerRef} />}
@@ -97,24 +110,40 @@ const MainHeader = styled.div`
   justify-content: center;
   align-items: center;
   z-index: 9;
+`;
 
-  & .search-bar {
-    width: 50%;
-    height: 40px;
-    padding: 0 10px;
+const SearchInput = styled.input`
+  width: 50%;
+  height: 40px;
+  padding: 0 10px;
+  color: #cee9b6;
+  background-color: transparent;
+  border: 1px solid #cee9b6;
+  border-radius: 10px;
+  outline: none;
+  &::placeholder {
     color: #cee9b6;
-    background-color: transparent;
-    border: 1px solid #cee9b6;
-    border-radius: 10px;
-    cursor: pointer;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    & img {
-      width: 30px;
-      height: 30px;
-    }
   }
+`;
+
+const SearchIconDiv = styled.div`
+  width: 35px;
+  height: 35px;
+  position: relative;
+  left: -50px;
+  cursor: pointer;
+  & img {
+    width: 100%;
+    height: 100%;
+  }
+`;
+
+const NonList = styled.div`
+  font-size: 30px;
+  color: #f8d49a;
+  width: 100%;
+  height: calc(100vh - 202px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
