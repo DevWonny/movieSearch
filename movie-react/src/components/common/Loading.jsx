@@ -22,6 +22,8 @@ const LoadingContainer = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  position: absolute;
+  top: 0;
 `;
 
 const LoadingText = styled.p`

@@ -5,6 +5,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { MovieAPI, MovieDetailAPI } from '../api/MovieAPI';
+import Loading from '../components/common/Loading';
 
 const Detail = () => {
   // navigate
@@ -28,25 +29,41 @@ const Detail = () => {
   const [movieCountry, setMovieCountry] = useState('');
   // 장르
   const [movieGenre, setMovieGenre] = useState([]);
-  // 제작사
-  const [movieProducer, setMovieProducer] = useState([]);
   // 영상 시간
   const [movieShowTime, setMovieShowTime] = useState('');
   // 내용
   const [movieContents, setMovieContents] = useState('');
 
+  // loading
+  // movieCd Loading
+  const [movieCdLoading, setMovieCdLoading] = useState(false);
+  // movie detail Loading
+  const [movieDetailLoading, setMovieDetailLoading] = useState(false);
+
   // api 호출
   // movieCd 가져오기
   const getMovieCd = async () => {
+    if (movieCdLoading) {
+      return;
+    }
+    setMovieCdLoading(true);
     const res = await MovieAPI(params.title, location.state.Date);
 
-    res.filter((el) => {
-      if (el.openDt.includes(location.state.Date)) setMovieCd(el.movieCd);
-    });
+    if (res) {
+      res.filter((el) => {
+        if (el.openDt.includes(location.state.Date)) setMovieCd(el.movieCd);
+        setMovieCdLoading(false);
+      });
+    }
   };
 
   // movie Detail 정보 가져오기
   const getMovieDetail = async () => {
+    if (movieDetailLoading) {
+      return;
+    }
+
+    setMovieDetailLoading(true);
     const res = await MovieDetailAPI(movieCd);
 
     if (res) {
@@ -56,8 +73,8 @@ const Detail = () => {
       setMovieOpenDate(res.openDt);
       setMovieCountry(res.nations[0].nationNm);
       setMovieGenre(res.genres);
-      setMovieProducer(res.companys);
       setMovieShowTime(res.showTm);
+      setMovieDetailLoading(false);
     }
   };
 
@@ -66,10 +83,12 @@ const Detail = () => {
   }, []);
 
   useEffect(() => {
-    getMovieDetail();
+    if (movieCd) {
+      getMovieDetail();
+    }
   }, [movieCd]);
 
-  console.log(movieDirector);
+  console.log(movieShowTime);
   return (
     <DetailContainer>
       <BackButton
@@ -84,19 +103,28 @@ const Detail = () => {
           <img src={location.state.poster} alt="poster" />
         </DetailPoster>
         <DetailDiv>{movieTitle}</DetailDiv>
+
+        <DetailDiv>개봉일 : {movieOpenDate}</DetailDiv>
+        <DetailDiv>국가 : {movieCountry}</DetailDiv>
         <DetailDiv>
-          {movieDirector[0]?.peopleNm} ({movieDirector[0]?.peopleNmEn})
+          장르 :{' '}
+          {movieGenre.map((el) => {
+            return el.genreNm + ' | ';
+          })}
         </DetailDiv>
-        <DetailDiv>actor / director</DetailDiv>
-        <DetailDiv>개봉일</DetailDiv>
-        <DetailDiv>국가</DetailDiv>
-        <DetailDiv>유형</DetailDiv>
-        <DetailDiv>장르</DetailDiv>
-        <DetailDiv>제작사</DetailDiv>
-        <DetailDiv>Grade</DetailDiv>
-        <DetailDiv>관람객 수</DetailDiv>
-        <DetailContent>내용</DetailContent>
+        <DetailDiv>러닝타임 : {movieShowTime}분</DetailDiv>
+        <DetailDiv>평점 : {location.state.rating}</DetailDiv>
+        <DetailDiv>
+          감독 : {movieDirector[0]?.peopleNm} ({movieDirector[0]?.peopleNmEn})
+        </DetailDiv>
+        <DetailDiv>
+          출연 :{' '}
+          {movieActor.map((el) => {
+            return `${el.peopleNm} (${el.peopleNmEn}) / `;
+          })}
+        </DetailDiv>
       </DetailWrap>
+      {(movieCdLoading || movieDetailLoading) && <Loading text="영화 목록을 불러오는 중입니다..." />}
     </DetailContainer>
   );
 };
@@ -159,11 +187,4 @@ const DetailDiv = styled.div`
   margin-bottom: 10px;
   line-height: 25px;
   color: #f8d49a;
-`;
-const DetailContent = styled.div`
-  width: 100%;
-  height: 100px;
-  color: #f8d49a;
-  border: 1px solid black;
-  box-sizing: border-box;
 `;
