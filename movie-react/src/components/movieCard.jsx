@@ -11,12 +11,14 @@ const MovieCard = (props) => {
   useEffect(() => {
     setMovieTitle(props.el.title.replaceAll('<b>', '').replaceAll('</b>', '').replaceAll('&amp;', '&'));
   }, []);
+
   // 더보기 클릭시 상세 페이지로 이동
   const onDetailClick = () => {
     navigate(`/detail/${movieTitle}`, {
       state: { poster: props.el.image, Date: props.el.pubDate, rating: props.el.userRating },
     });
   };
+
   return (
     <Card.Container>
       <Card.Poster>

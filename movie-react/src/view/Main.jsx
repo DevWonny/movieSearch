@@ -26,21 +26,65 @@ const Main = () => {
   // main Container Ref
   const mainContainerRef = useRef();
 
+  // 마지막 요소 확인
+  const [target, setTarget] = useState(null);
+
+  // 전체 영화 수
+  const [totalMovieCount, setTotalMovieCount] = useState(null);
+  // start state
+  const [pageStart, setPageStart] = useState(1);
+
   // api 호출
   const naverMovieApi = async () => {
     setIsLoading(true);
-    const res = await NaverMovieAPI({ query: movieTitle });
+    const res = await NaverMovieAPI({ query: movieTitle, start : pageStart });
+
 
     if (res) {
-      setIsLoading(false);
-      setMoiveList(res.data.items);
+      setTotalMovieCount(res.data.total);
+      setMoiveList((prevData)=>[...prevData, ...res.data.items]);
     }
+    setIsLoading(false);
   };
 
   const handler = (e) => {
     const target = e.target;
     setTargetScrollTop(target.scrollTop);
   };
+  console.log('out -totalMovieCount',totalMovieCount)
+  console.log('out -movieList',movieList.length)
+
+  // intersection
+  const onIntersect = async ([entry], observer)=>{
+    console.log('totalMovieCount',totalMovieCount)
+    console.log('movieList',movieList.length)
+    if(entry.isIntersecting && !isLoading){
+
+      // IntersectionObserver.unobserve -> target element 에 대한 관찰을 멈추가 싶을 때 사용.
+      if(totalMovieCount > movieList?.length){
+        observer.unobserve(entry.target);
+        await naverMovieApi();
+        observer.observe(entry.target);
+      }
+    }
+  }
+
+  useEffect(()=>{
+    // 처음 target이 변경 되기때문에 초기 1회 실행
+    // 그래서 따로 초기 실행함수 필요 없음
+    let observer;
+
+    if(!!target){
+      observer = new IntersectionObserver(onIntersect, {
+        threshold: 0.4,
+      });
+
+      observer.observe(target);
+    }
+  },[target]);
+
+
+
 
   return (
     <MainContainer ref={mainContainerRef} className="scrollTop" onScroll={handler}>
@@ -64,13 +108,15 @@ const Main = () => {
         </SearchIconDiv>
       </MainHeader>
       {/* Component */}
-      {movieList.length > 0 ? (
-        movieList.map((el, index) => {
+      {movieList?.length > 0 ? (
+        movieList?.map((el, index) => {
           return <MovieCard key={`Main-movie-card-${index}`} el={el} />;
         })
       ) : (
         <NonList>영화를 검색해주세요!</NonList>
       )}
+
+      <div ref={setTarget} className="targetRef"></div>
 
       {/* Top Button */}
       {targetScrollTop > 200 && <TopButton mainContainerRef={mainContainerRef} />}
@@ -95,6 +141,11 @@ const MainContainer = styled.div`
   // scroll dispaly hidden
   &::-webkit-scrollbar {
     display: none;
+  }
+  
+  & .targetRef{
+    width : 100%;
+    height : 50px;
   }
 `;
 
