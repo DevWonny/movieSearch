@@ -9,6 +9,7 @@ import NaverMovieAPI from '../api/NaverMovieAPI';
 import SearchIcon from '../assets/icon/serachIcon.svg';
 import TopButton from '../components/common/TopButton';
 import Loading from '../components/common/Loading';
+import Pagination from "../components/Pagination";
 
 const Main = () => {
     // 영화 목록
@@ -29,10 +30,11 @@ const Main = () => {
     // total page
     const [totalPage, setTotalPage] = useState(null);
     // current page
-    const [currentPage, setCurrentPage] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
 
     // main Container Ref
     const mainContainerRef = useRef();
+
 
     // api 호출
     // 초기 검색 호출
@@ -62,14 +64,39 @@ const Main = () => {
         }
     }
 
+    // 현재 페이지 변경시 호출 api
+    const paginationApi = async()=>{
+        if(movieTitle){
+            setIsLoading(true);
+            const res = await NaverMovieAPI({query: movieTitle, start: movieStart});
+            if (res) {
+                // 더보기 활성화 시 활용
+                // setMovieList(prev => [...prev, ...res.data.items]);
+
+                // pagination 활성화 시 활용
+                setMovieList(res.data.items);
+
+            }
+            setIsLoading(false);
+        }
+    }
+
     const handler = (e) => {
         const target = e.target;
         setTargetScrollTop(target.scrollTop);
     };
 
-    useEffect(() => {
-        setCurrentPage(Math.ceil(movieList.length / 10));
-    }, [movieList])
+    // 더보기 활성화 시 활용
+    // useEffect(() => {
+    //     setCurrentPage(Math.ceil(movieList.length / 10));
+    // }, [movieList])
+
+    // pagination 활성화 시 활용
+    useEffect(()=>{
+        paginationApi();
+        mainContainerRef.current.scrollTop= 0;
+    },[currentPage])
+
 
     return (
         <MainContainer ref={mainContainerRef} className="scrollTop" onScroll={handler}>
@@ -101,12 +128,17 @@ const Main = () => {
                 <NonList>영화를 검색해주세요!</NonList>
             )}
 
-            {/* More Button */}
-            {movieList?.length > 0 && (currentPage !== totalPage) &&
-                <MoreButton onClick={async () => {
-                    setMovieStart(movieStart + 10)
-                    await moreMovieApi()
-                }}>더보기</MoreButton>}
+            {/* More Button 처리 */}
+            {/*{movieList?.length > 0 && (currentPage !== totalPage) &&*/}
+            {/*    <MoreButton onClick={async () => {*/}
+            {/*        setMovieStart(movieStart + 10)*/}
+            {/*        await moreMovieApi()*/}
+            {/*    }}>더보기</MoreButton>}*/}
+
+            {/* pagination 처리*/}
+            {totalPage && <Pagination totalPage={totalPage} setMovieStart={setMovieStart} movieStart={movieStart} currentPage={currentPage} setCurrentPage={setCurrentPage}/>}
+
+            {/* infinite scroll 처리*/}
 
             {/* Top Button */}
             {targetScrollTop > 200 && <TopButton mainContainerRef={mainContainerRef}/>}
