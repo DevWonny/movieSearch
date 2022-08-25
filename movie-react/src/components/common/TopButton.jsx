@@ -6,10 +6,7 @@ import ArrowTop from '../../assets/icon/arrowTop.svg';
 
 const TopButton = ({ mainContainerRef }) => {
   const onTop = () => {
-    document.querySelector('.scrollTop').scrollTo({
-      top: mainContainerRef.current.offsetTop,
-      behavior: 'smooth',
-    });
+    mainContainerRef.current.scrollTop= 0;
   };
 
   return (
