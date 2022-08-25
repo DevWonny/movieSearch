@@ -24,6 +24,7 @@ const LoadingContainer = styled.div`
   align-items: center;
   position: absolute;
   top: 0;
+  left : 0;
 `;
 
 const LoadingText = styled.p`
