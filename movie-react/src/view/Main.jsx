@@ -45,7 +45,13 @@ const Main = () => {
   // 초기 인기순 api 호출
   const initPopularApi = async () => {
     const res = await PopularMovieAPI();
-    console.log(res);
+
+    if (res) {
+      setTotalPage(res.total_pages);
+      setTotalContents(res.total_results);
+      setMovieList(res.results);
+      console.log('res', res);
+    }
   };
 
   useEffect(() => {
@@ -53,19 +59,19 @@ const Main = () => {
   }, []);
 
   // 초기 검색 호출
-  const initNaverMovieApi = async () => {
-    if (movieTitle) {
-      setIsLoading(true);
-      const res = await NaverMovieAPI({ query: movieTitle, start: movieStart });
+  // const initNaverMovieApi = async () => {
+  //   if (movieTitle) {
+  //     setIsLoading(true);
+  //     const res = await NaverMovieAPI({ query: movieTitle, start: movieStart });
 
-      if (res) {
-        setTotalPage(Math.ceil(res.data.total / 10));
-        setTotalContents(res.data.total);
-        setMovieList(res.data.items);
-      }
-      setIsLoading(false);
-    }
-  };
+  //     if (res) {
+  //       setTotalPage(Math.ceil(res.data.total / 10));
+  //       setTotalContents(res.data.total);
+  //       setMovieList(res.data.items);
+  //     }
+  //     setIsLoading(false);
+  //   }
+  // };
 
   // 더보기 클릭 시 호출 api
   //   const moreMovieApi = async () => {
@@ -81,20 +87,20 @@ const Main = () => {
   //   };
 
   // 현재 페이지 변경시 호출 api
-  const paginationApi = async () => {
-    if (movieTitle) {
-      setIsLoading(true);
-      const res = await NaverMovieAPI({ query: movieTitle, start: movieStart + 10 });
-      if (res) {
-        // 더보기 및 infinite scroll 활성화 시 활용
-        setMovieList((prev) => [...prev, ...res.data.items]);
+  // const paginationApi = async () => {
+  //   if (movieTitle) {
+  //     setIsLoading(true);
+  //     const res = await NaverMovieAPI({ query: movieTitle, start: movieStart + 10 });
+  //     if (res) {
+  //       // 더보기 및 infinite scroll 활성화 시 활용
+  //       setMovieList((prev) => [...prev, ...res.data.items]);
 
-        // pagination 활성화 시 활용
-        // setMovieList(res.data.items);
-      }
-      setIsLoading(false);
-    }
-  };
+  //       // pagination 활성화 시 활용
+  //       // setMovieList(res.data.items);
+  //     }
+  //     setIsLoading(false);
+  //   }
+  // };
 
   const handler = (e) => {
     const target = e.target;
@@ -102,25 +108,25 @@ const Main = () => {
   };
 
   // intersection
-  const onIntersect = async ([entry], observer) => {
-    if (entry.isIntersecting) {
-      observer.unobserve(entry.target);
-      await paginationApi();
-      observer.observe(entry.target);
-    }
-  };
+  // const onIntersect = async ([entry], observer) => {
+  //   if (entry.isIntersecting) {
+  //     observer.unobserve(entry.target);
+  //     await paginationApi();
+  //     observer.observe(entry.target);
+  //   }
+  // };
 
-  useEffect(() => {
-    let observer;
-    if (movieList.length === totalContents) return;
-    if (observeRef.current) {
-      observer = new IntersectionObserver(onIntersect, {
-        threshold: 0.4,
-      });
-      observer.observe(observeRef.current);
-    }
-    return () => observer && observer.disconnect();
-  }, [observeRef.current, movieList]);
+  // useEffect(() => {
+  //   let observer;
+  //   if (movieList.length === totalContents) return;
+  //   if (observeRef.current) {
+  //     observer = new IntersectionObserver(onIntersect, {
+  //       threshold: 0.4,
+  //     });
+  //     observer.observe(observeRef.current);
+  //   }
+  //   return () => observer && observer.disconnect();
+  // }, [observeRef.current, movieList]);
 
   // 더보기 활성화 시 활용
   // useEffect(() => {
@@ -145,13 +151,13 @@ const Main = () => {
             onChange={(e) => {
               setMovieTitle(e.target.value);
             }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                initNaverMovieApi();
-              }
-            }}
+            // onKeyDown={(e) => {
+            //   if (e.key === 'Enter') {
+            //     initNaverMovieApi();
+            //   }
+            // }}
           />
-          <SearchIconDiv onClick={() => initNaverMovieApi()}>
+          <SearchIconDiv>
             <img src={SearchIcon} alt="searchIcon" />
           </SearchIconDiv>
         </MainHeader>
