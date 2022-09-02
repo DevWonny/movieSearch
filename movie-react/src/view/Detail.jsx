@@ -1,138 +1,103 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 
-import {useLocation, useNavigate, useParams} from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import styled from 'styled-components';
 
-import {MovieAPI, MovieDetailAPI} from '../api/MovieAPI';
+import { DetailMovieAPI, DetailPersonAPI } from '../api/MovieAPI';
 import Loading from '../components/common/Loading';
 
 const Detail = () => {
-    // navigate
-    const navigate = useNavigate();
-    // location
-    const location = useLocation();
-    // params
-    const params = useParams();
+  // navigate
+  const navigate = useNavigate();
+  // params
+  const params = useParams();
 
-    // movieCd
-    const [movieCd, setMovieCd] = useState('');
-    // movie Title
-    const [movieTitle, setMovieTitle] = useState('');
-    // movie Actor
-    const [movieActor, setMovieActor] = useState([]);
-    // movie Director
-    const [movieDirector, setMovieDirector] = useState([]);
-    // 개봉일
-    const [movieOpenDate, setMovieOpenDate] = useState('');
-    // 국가
-    const [movieCountry, setMovieCountry] = useState('');
-    // 장르
-    const [movieGenre, setMovieGenre] = useState([]);
-    // 영상 시간
-    const [movieShowTime, setMovieShowTime] = useState('');
-    // 내용
-    const [movieContents, setMovieContents] = useState('');
+  // movie poster
+  const [moviePoster, setMoviePoster] = useState('');
+  // movie Title
+  const [movieTitle, setMovieTitle] = useState('');
+  // movie Actor
+  const [movieActor, setMovieActor] = useState([]);
+  // movie Director
+  const [movieDirector, setMovieDirector] = useState([]);
+  // 개봉일
+  const [movieOpenDate, setMovieOpenDate] = useState('');
+  // 국가
+  const [movieCountry, setMovieCountry] = useState('');
+  // 장르
+  const [movieGenre, setMovieGenre] = useState([]);
+  // 영상 시간
+  const [movieRunTime, setMovieRunTime] = useState('');
+  // 평점
+  const [movieAverage, setMovieAverage] = useState('');
+  // 내용
+  const [movieContents, setMovieContents] = useState('');
 
-    // loading
-    // movieCd Loading
-    const [movieCdLoading, setMovieCdLoading] = useState(false);
-    // movie detail Loading
-    const [movieDetailLoading, setMovieDetailLoading] = useState(false);
+  // loading
+  // movie detail Loading
+  const [movieDetailLoading, setMovieDetailLoading] = useState(false);
 
-    // api 호출
-    // movieCd 가져오기
-    const getMovieCd = async () => {
-        if (movieCdLoading) {
-            return;
-        }
-        setMovieCdLoading(true);
-        const res = await MovieAPI(params.title, location.state.date);
-        if (res) {
-            res.filter((el) => {
-                if (el.openDt.includes(location.state.date) && (el.movieNm === location.state.title)) setMovieCd(el.movieCd);
-            });
-        }
-        setMovieCdLoading(false);
-    };
+  const imageUrl = process.env.REACT_APP_TMDB_IMAGE_URL;
 
-    // movie Detail 정보 가져오기
-    const getMovieDetail = async () => {
-        if (movieDetailLoading) {
-            return;
-        }
+  // api 호출
+  // 영화 상세 정보 호출
+  const getDetailMovie = async () => {
+    const res = await DetailMovieAPI(params.title);
 
+    if (res) {
+      setMoviePoster(res.poster_path);
+      setMovieTitle(res.title);
+      setMovieOpenDate(res.release_date);
+      setMovieCountry(res.production_countries[0].name);
+      setMovieGenre(res.genres);
+      setMovieRunTime(res.runtime);
+      setMovieAverage(res.vote_average);
+    }
+  };
+  // 감독 및 배우 호출
+  const getDetailPerson = async () => {
+    const res = await DetailPersonAPI(params.title);
+    console.log('actor', res);
+  };
 
-        setMovieDetailLoading(true);
-        const res = await MovieDetailAPI(movieCd);
+  useEffect(() => {
+    getDetailMovie();
+    getDetailPerson();
+  }, []);
+  return (
+    <DetailContainer>
+      <BackButton
+        onClick={() => {
+          navigate(-1);
+        }}>
+        목록보기
+      </BackButton>
 
+      <DetailWrap>
+        <DetailPoster>
+          <img src={`${imageUrl}${moviePoster}`} alt="poster" />
+        </DetailPoster>
+        <DetailDiv>제목 : {movieTitle}</DetailDiv>
 
-        if (res) {
-            setMovieTitle(res.movieNm);
-            setMovieActor(res.actors);
-            setMovieDirector(res.directors);
-            setMovieOpenDate(res.openDt);
-            setMovieCountry(res.nations[0].nationNm);
-            setMovieGenre(res.genres);
-            setMovieShowTime(res.showTm);
-        }
-        setMovieDetailLoading(false);
-    };
+        <DetailDiv>개봉일 : {movieOpenDate} </DetailDiv>
+        <DetailDiv>국가 : {movieCountry}</DetailDiv>
+        <DetailDiv>
+          장르 :{' '}
+          {movieGenre?.map((genre) => {
+            return `${genre.name} | `;
+          })}{' '}
+        </DetailDiv>
 
-    useEffect(() => {
-        getMovieCd();
-    }, []);
+        <DetailDiv>러닝타임 : {movieRunTime}분</DetailDiv>
 
-    useEffect(() => {
-        if (movieCd) {
-            getMovieDetail();
-        }
-    }, [movieCd]);
-
-    return (
-        <DetailContainer>
-            <BackButton
-                onClick={() => {
-                    navigate(-1);
-                }}>
-                목록보기
-            </BackButton>
-
-            <DetailWrap>
-                <DetailPoster>
-                    <img src={location.state.poster} alt="poster"/>
-                </DetailPoster>
-                <DetailDiv>{movieTitle}</DetailDiv>
-
-                <DetailDiv>개봉일 : {movieOpenDate ? movieOpenDate : location.state.date}</DetailDiv>
-                {movieCountry && <DetailDiv>국가 : {movieCountry}</DetailDiv>}
-                {movieGenre.length > 0 && <DetailDiv>
-                    장르 :{' '}
-                    {movieGenre.map((el) => {
-                        return el.genreNm + ' | ';
-                    })}
-                </DetailDiv>}
-
-                {movieShowTime && <DetailDiv>러닝타임 : {movieShowTime}분</DetailDiv>}
-
-                <DetailDiv>평점 : {location.state.rating}</DetailDiv>
-                <DetailDiv>
-                    감독 :
-                    {movieDirector.length > 0 ? movieDirector.map(el => {
-                        return `${el.peopleNm} (${el.peopleNmEn})`;
-                    }) : location.state.director}
-
-                </DetailDiv>
-                <DetailDiv>
-                    출연 :{' '}
-                    {movieActor.length > 0 ? movieActor.map((el) => {
-                        return `${el.peopleNm} (${el.peopleNmEn}) / `;
-                    }) : location.state.actor}
-                </DetailDiv>
-            </DetailWrap>
-            {(movieCdLoading || movieDetailLoading) && <Loading text="영화 목록을 불러오는 중입니다..."/>}
-        </DetailContainer>
-    );
+        <DetailDiv>평점 : {movieAverage}</DetailDiv>
+        <DetailDiv>감독 :</DetailDiv>
+        <DetailDiv>출연 : </DetailDiv>
+      </DetailWrap>
+      {movieDetailLoading && <Loading text="영화 목록을 불러오는 중입니다..." />}
+    </DetailContainer>
+  );
 };
 
 export default Detail;
@@ -178,8 +143,8 @@ const DetailWrap = styled.div`
 `;
 
 const DetailPoster = styled.div`
-  width: 180px;
-  height: 250px;
+  width: 200px;
+  height: 270px;
   background-color: azure;
   margin: 0 auto 10px;
 

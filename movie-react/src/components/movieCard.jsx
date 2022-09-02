@@ -9,7 +9,6 @@ const MovieCard = (props) => {
   const [movieTitle, setMovieTitle] = useState('');
 
   const imageUrl = process.env.REACT_APP_TMDB_IMAGE_URL;
-  console.log(props.el);
 
   useEffect(() => {
     setMovieTitle(props.el.title.replaceAll('<b>', '').replaceAll('</b>', '').replaceAll('&amp;', '&'));
@@ -17,31 +16,19 @@ const MovieCard = (props) => {
 
   // 더보기 클릭시 상세 페이지로 이동
   const onDetailClick = () => {
-    navigate(`/detail/${movieTitle}`, {
-      state: {
-        poster: props.el.image,
-        date: props.el.pubDate,
-        rating: props.el.userRating,
-        title: movieTitle,
-        director: props.el.director,
-        actor: props.el.actor,
-      },
-    });
+    navigate(`/detail/${props.el.id}`);
   };
 
   return (
     <Card.Container>
       <Card.Poster>
-        <Card.Image src={`https://image.tmdb.org/t/p/w200${props.el.poster_path}`} />
+        <Card.Image src={`${imageUrl}${props.el.poster_path}`} />
       </Card.Poster>
       <Card.ContentContainer>
-        <Card.EtcDiv>{movieTitle && movieTitle}</Card.EtcDiv>
-        <Card.EtcDiv>{props.el.pubDate}</Card.EtcDiv>
-        <Card.EtcDiv>{props.el.userRating}</Card.EtcDiv>
-        <Card.EtcDiv>
-          {props.el.director}
-          {props.el.actor}
-        </Card.EtcDiv>
+        <Card.EtcDiv>제목 : {movieTitle && movieTitle}</Card.EtcDiv>
+        <Card.EtcDiv>개봉일 : {props.el.release_date}</Card.EtcDiv>
+        <Card.EtcDiv>평점 : {props.el.vote_average}</Card.EtcDiv>
+        <Card.EtcDiv>{props.el.overview.substr(0, 200) + '...'}</Card.EtcDiv>
         <div
           className="Detail"
           onClick={() => {

@@ -50,7 +50,7 @@ const Main = () => {
       setTotalPage(res.total_pages);
       setTotalContents(res.total_results);
       setMovieList(res.results);
-      console.log('res', res);
+      // console.log('res', res);
     }
   };
 
