@@ -34,3 +34,14 @@ export const MovieDetailAPI = async (movieCd) => {
     console.log(e);
   }
 };
+
+export const PopularMovieAPI = async () => {
+  const key = process.env.REACT_APP_TMDB_KEY;
+  try {
+    const res = await axios.get(`https://api.themoviedb.org/3/movie/popular?api_key=${key}&page=1`);
+
+    return res.data;
+  } catch (e) {
+    console.log(e);
+  }
+};

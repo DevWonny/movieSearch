@@ -1,185 +1,189 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import styled from 'styled-components';
 
 import MovieCard from '../components/movieCard';
 
 import NaverMovieAPI from '../api/NaverMovieAPI';
+import { PopularMovieAPI } from '../api/MovieAPI';
 
 import SearchIcon from '../assets/icon/serachIcon.svg';
 import TopButton from '../components/common/TopButton';
 import Loading from '../components/common/Loading';
-import Pagination from "../components/Pagination";
+import Pagination from '../components/Pagination';
 
 const Main = () => {
-    // 영화 목록
-    const [movieList, setMovieList] = useState([]);
+  // 영화 목록
+  const [movieList, setMovieList] = useState([]);
 
-    // lading
-    const [isLoading, setIsLoading] = useState(false);
+  // lading
+  const [isLoading, setIsLoading] = useState(false);
 
-    // scrollTop
-    const [targetScrollTop, setTargetScrollTop] = useState(null);
+  // scrollTop
+  const [targetScrollTop, setTargetScrollTop] = useState(null);
 
-    // 영화 제목
-    const [movieTitle, setMovieTitle] = useState('');
+  // 영화 제목
+  const [movieTitle, setMovieTitle] = useState('');
 
-    // movie start state
-    const [movieStart, setMovieStart] = useState(1);
+  // movie start state
+  const [movieStart, setMovieStart] = useState(1);
 
-    // total contents
-    const [totalContents, setTotalContents] = useState(null);
-    // total page
-    const [totalPage, setTotalPage] = useState(null);
-    // current page
-    const [currentPage, setCurrentPage] = useState(1);
+  // total contents
+  const [totalContents, setTotalContents] = useState(null);
+  // total page
+  const [totalPage, setTotalPage] = useState(null);
+  // current page
+  const [currentPage, setCurrentPage] = useState(1);
 
-    // main Container Ref
-    const mainContainerRef = useRef();
+  // main Container Ref
+  const mainContainerRef = useRef();
 
-    // infinite scroll Ref
-    const observeRef = useRef();
+  // infinite scroll Ref
+  const observeRef = useRef();
 
+  // api 호출
+  // 초기 인기순 api 호출
+  const initPopularApi = async () => {
+    const res = await PopularMovieAPI();
+    console.log(res);
+  };
 
-    // api 호출
-    // 초기 검색 호출
-    const initNaverMovieApi = async () => {
-        if (movieTitle) {
-            setIsLoading(true);
-            const res = await NaverMovieAPI({query: movieTitle, start: movieStart});
+  useEffect(() => {
+    initPopularApi();
+  }, []);
 
-            if (res) {
-                setTotalPage(Math.ceil(res.data.total / 10));
-                setTotalContents(res.data.total);
-                setMovieList(res.data.items);
-            }
-            setIsLoading(false);
-        }
-    };
+  // 초기 검색 호출
+  const initNaverMovieApi = async () => {
+    if (movieTitle) {
+      setIsLoading(true);
+      const res = await NaverMovieAPI({ query: movieTitle, start: movieStart });
 
-    // 더보기 클릭 시 호출 api
-    const moreMovieApi = async () => {
-        if (movieTitle) {
-            setIsLoading(true);
-            const res = await NaverMovieAPI({query: movieTitle, start: movieStart + 10});
-
-            if (res) {
-                setMovieList(prev => [...prev, ...res.data.items]);
-            }
-            setIsLoading(false);
-        }
+      if (res) {
+        setTotalPage(Math.ceil(res.data.total / 10));
+        setTotalContents(res.data.total);
+        setMovieList(res.data.items);
+      }
+      setIsLoading(false);
     }
+  };
 
-    // 현재 페이지 변경시 호출 api
-    const paginationApi = async()=>{
-        if(movieTitle){
-            setIsLoading(true);
-            const res = await NaverMovieAPI({query: movieTitle, start: movieStart+10});
-            if (res) {
-                // 더보기 및 infinite scroll 활성화 시 활용
-                setMovieList(prev => [...prev, ...res.data.items]);
+  // 더보기 클릭 시 호출 api
+  //   const moreMovieApi = async () => {
+  //     if (movieTitle) {
+  //       setIsLoading(true);
+  //       const res = await NaverMovieAPI({ query: movieTitle, start: movieStart + 10 });
 
-                // pagination 활성화 시 활용
-                // setMovieList(res.data.items);
+  //       if (res) {
+  //         setMovieList((prev) => [...prev, ...res.data.items]);
+  //       }
+  //       setIsLoading(false);
+  //     }
+  //   };
 
-            }
-            setIsLoading(false);
-        }
+  // 현재 페이지 변경시 호출 api
+  const paginationApi = async () => {
+    if (movieTitle) {
+      setIsLoading(true);
+      const res = await NaverMovieAPI({ query: movieTitle, start: movieStart + 10 });
+      if (res) {
+        // 더보기 및 infinite scroll 활성화 시 활용
+        setMovieList((prev) => [...prev, ...res.data.items]);
+
+        // pagination 활성화 시 활용
+        // setMovieList(res.data.items);
+      }
+      setIsLoading(false);
     }
+  };
 
-    const handler = (e) => {
-        const target = e.target;
-        setTargetScrollTop(target.scrollTop);
-    };
+  const handler = (e) => {
+    const target = e.target;
+    setTargetScrollTop(target.scrollTop);
+  };
 
-    // intersection
-    const onIntersect = async ([entry], observer) => {
-        if (entry.isIntersecting) {
-            observer.unobserve(entry.target);
-            await paginationApi();
-            observer.observe(entry.target);
-        }
-    };
+  // intersection
+  const onIntersect = async ([entry], observer) => {
+    if (entry.isIntersecting) {
+      observer.unobserve(entry.target);
+      await paginationApi();
+      observer.observe(entry.target);
+    }
+  };
 
+  useEffect(() => {
+    let observer;
+    if (movieList.length === totalContents) return;
+    if (observeRef.current) {
+      observer = new IntersectionObserver(onIntersect, {
+        threshold: 0.4,
+      });
+      observer.observe(observeRef.current);
+    }
+    return () => observer && observer.disconnect();
+  }, [observeRef.current, movieList]);
 
-    useEffect(() => {
-        let observer;
-        if(movieList.length === totalContents) return;
-        if (observeRef.current) {
-            observer = new IntersectionObserver(onIntersect, {
-                threshold: 0.4,
-            });
-            observer.observe(observeRef.current);
-        }
-        return () => observer && observer.disconnect();
-    }, [observeRef.current, movieList]);
+  // 더보기 활성화 시 활용
+  // useEffect(() => {
+  //     setCurrentPage(Math.ceil(movieList.length / 10));
+  // }, [movieList])
 
-    // 더보기 활성화 시 활용
-    // useEffect(() => {
-    //     setCurrentPage(Math.ceil(movieList.length / 10));
-    // }, [movieList])
+  // pagination 활성화 시 활용
+  // useEffect(()=>{
+  //     paginationApi();
+  //     mainContainerRef.current.scrollTop= 0;
+  // },[currentPage])
 
-    // pagination 활성화 시 활용
-    // useEffect(()=>{
-    //     paginationApi();
-    //     mainContainerRef.current.scrollTop= 0;
-    // },[currentPage])
+  return (
+    <>
+      <MainContainer ref={mainContainerRef} className="scrollTop" onScroll={handler}>
+        <MainHeader>
+          <SearchInput
+            type="text"
+            placeholder="검색어를 입력해주세요."
+            id="search"
+            value={movieTitle}
+            onChange={(e) => {
+              setMovieTitle(e.target.value);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                initNaverMovieApi();
+              }
+            }}
+          />
+          <SearchIconDiv onClick={() => initNaverMovieApi()}>
+            <img src={SearchIcon} alt="searchIcon" />
+          </SearchIconDiv>
+        </MainHeader>
+        {/* Component */}
+        {movieList?.length > 0 ? (
+          movieList?.map((el, index) => {
+            return <MovieCard key={`Main-movie-card-${index}`} el={el} />;
+          })
+        ) : (
+          <NonList>영화를 검색해주세요!</NonList>
+        )}
 
-    return (
-      <>
-        <MainContainer ref={mainContainerRef} className="scrollTop" onScroll={handler}>
-            <MainHeader>
-                <SearchInput
-                    type="text"
-                    placeholder="검색어를 입력해주세요."
-                    id="search"
-                    value={movieTitle}
-                    onChange={(e) => {
-                        setMovieTitle(e.target.value);
-                    }}
-                    onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                            initNaverMovieApi();
-                        }
-                    }}
-                />
-                <SearchIconDiv onClick={() => initNaverMovieApi()}>
-                    <img src={SearchIcon} alt="searchIcon"/>
-                </SearchIconDiv>
-            </MainHeader>
-            {/* Component */}
-            {movieList?.length > 0 ? (
-                movieList?.map((el, index) => {
-                    return <MovieCard key={`Main-movie-card-${index}`} el={el}/>;
-                })
-            ) : (
-                <NonList>영화를 검색해주세요!</NonList>
-            )}
+        {/* More Button 처리 */}
+        {/*{movieList?.length > 0 && (currentPage !== totalPage) &&*/}
+        {/*    <MoreButton onClick={async () => {*/}
+        {/*        setMovieStart(movieStart + 10)*/}
+        {/*        await moreMovieApi()*/}
+        {/*    }}>더보기</MoreButton>}*/}
 
-            {/* More Button 처리 */}
-            {/*{movieList?.length > 0 && (currentPage !== totalPage) &&*/}
-            {/*    <MoreButton onClick={async () => {*/}
-            {/*        setMovieStart(movieStart + 10)*/}
-            {/*        await moreMovieApi()*/}
-            {/*    }}>더보기</MoreButton>}*/}
+        {/* pagination 처리*/}
+        {/*{totalPage && <Pagination totalPage={totalPage} setMovieStart={setMovieStart} movieStart={movieStart} currentPage={currentPage} setCurrentPage={setCurrentPage}/>}*/}
 
-            {/* pagination 처리*/}
-            {/*{totalPage && <Pagination totalPage={totalPage} setMovieStart={setMovieStart} movieStart={movieStart} currentPage={currentPage} setCurrentPage={setCurrentPage}/>}*/}
+        {/* infinite scroll 처리*/}
+        {movieList.length > 0 && <TargetDiv ref={observeRef}></TargetDiv>}
 
-            {/* infinite scroll 처리*/}
-            {movieList.length > 0 && <TargetDiv ref={observeRef}></TargetDiv>}
-
-
-            {/* Top Button */}
-            {targetScrollTop > 200 && <TopButton mainContainerRef={mainContainerRef}/>}
-
-
-
-        </MainContainer>
-    {/* loading page */}
-    {isLoading && <Loading text="영화 목록을 불러오는 중입니다..."/>}
-      </>
-    );
+        {/* Top Button */}
+        {targetScrollTop > 200 && <TopButton mainContainerRef={mainContainerRef} />}
+      </MainContainer>
+      {/* loading page */}
+      {isLoading && <Loading text="영화 목록을 불러오는 중입니다..." />}
+    </>
+  );
 };
 
 export default Main;
@@ -266,9 +270,9 @@ const MoreButton = styled.div`
   &:hover {
     background-color: #8fc79a;
   }
-`
+`;
 
 const TargetDiv = styled.div`
-    width : 100%;
-    height: 10px;
+  width: 100%;
+  height: 10px;
 `;
