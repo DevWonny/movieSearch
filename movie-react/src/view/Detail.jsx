@@ -37,14 +37,15 @@ const Detail = () => {
   // loading
   // movie detail Loading
   const [movieDetailLoading, setMovieDetailLoading] = useState(false);
+  const [movieDetailPersonLoading, setMovieDetailPersonLoading] = useState(false);
 
   const imageUrl = process.env.REACT_APP_TMDB_IMAGE_URL;
 
   // api 호출
   // 영화 상세 정보 호출
   const getDetailMovie = async () => {
+    setMovieDetailLoading(true);
     const res = await DetailMovieAPI(params.title);
-    console.log(res);
 
     if (res) {
       setMoviePoster(res.poster_path);
@@ -56,9 +57,11 @@ const Detail = () => {
       setMovieAverage(res.vote_average);
       setMovieContents(res.overview);
     }
+    setMovieDetailLoading(false);
   };
   // 감독 및 배우 호출
   const getDetailPerson = async () => {
+    setMovieDetailPersonLoading(true);
     const res = await DetailPersonAPI(params.title);
 
     setMovieActor(
@@ -72,6 +75,7 @@ const Detail = () => {
     res.crew.filter((el) => {
       if (el.job === 'Director') setMovieDirector(el.name);
     });
+    setMovieDetailPersonLoading(false);
   };
 
   useEffect(() => {
@@ -123,7 +127,7 @@ const Detail = () => {
         </DetailDiv>
         <DetailDiv>줄거리 : {movieContents}</DetailDiv>
       </DetailWrap>
-      {movieDetailLoading && <Loading text="영화 목록을 불러오는 중입니다..." />}
+      {(movieDetailLoading || movieDetailPersonLoading) && <Loading text="영화 정보를 불러오는 중입니다..." />}
     </DetailContainer>
   );
 };

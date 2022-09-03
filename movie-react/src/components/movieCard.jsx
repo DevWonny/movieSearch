@@ -6,13 +6,7 @@ import styled from 'styled-components';
 
 const MovieCard = (props) => {
   const navigate = useNavigate();
-  const [movieTitle, setMovieTitle] = useState('');
-
   const imageUrl = process.env.REACT_APP_TMDB_IMAGE_URL;
-
-  useEffect(() => {
-    setMovieTitle(props.el.title.replaceAll('<b>', '').replaceAll('</b>', '').replaceAll('&amp;', '&'));
-  }, []);
 
   // 더보기 클릭시 상세 페이지로 이동
   const onDetailClick = () => {
@@ -25,7 +19,7 @@ const MovieCard = (props) => {
         <Card.Image src={`${imageUrl}${props.el.poster_path}`} />
       </Card.Poster>
       <Card.ContentContainer>
-        <Card.EtcDiv>제목 : {movieTitle && movieTitle}</Card.EtcDiv>
+        <Card.EtcDiv>제목 : {props.el.title}</Card.EtcDiv>
         <Card.EtcDiv>개봉일 : {props.el.release_date}</Card.EtcDiv>
         <Card.EtcDiv>평점 : {props.el.vote_average}</Card.EtcDiv>
         <Card.EtcDiv>{props.el.overview.substr(0, 300)}</Card.EtcDiv>
