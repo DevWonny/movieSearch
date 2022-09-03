@@ -44,6 +44,7 @@ const Detail = () => {
   // 영화 상세 정보 호출
   const getDetailMovie = async () => {
     const res = await DetailMovieAPI(params.title);
+    console.log(res);
 
     if (res) {
       setMoviePoster(res.poster_path);
@@ -53,12 +54,24 @@ const Detail = () => {
       setMovieGenre(res.genres);
       setMovieRunTime(res.runtime);
       setMovieAverage(res.vote_average);
+      setMovieContents(res.overview);
     }
   };
   // 감독 및 배우 호출
   const getDetailPerson = async () => {
     const res = await DetailPersonAPI(params.title);
-    console.log('actor', res);
+
+    setMovieActor(
+      res.cast
+        .filter((el) => {
+          if (el.known_for_department === 'Acting') return el;
+        })
+        .slice(0, 5)
+    );
+
+    res.crew.filter((el) => {
+      if (el.job === 'Director') setMovieDirector(el.name);
+    });
   };
 
   useEffect(() => {
@@ -92,8 +105,23 @@ const Detail = () => {
         <DetailDiv>러닝타임 : {movieRunTime}분</DetailDiv>
 
         <DetailDiv>평점 : {movieAverage}</DetailDiv>
-        <DetailDiv>감독 :</DetailDiv>
-        <DetailDiv>출연 : </DetailDiv>
+        <DetailDiv>감독 : {movieDirector}</DetailDiv>
+        <DetailDiv className="test">
+          출연 :
+          <ActorContainer>
+            {movieActor.map((actor, index) => {
+              return (
+                <ActorProfile key={`Detail-actor-profile-${index}`}>
+                  <ActorProfileImg>
+                    <img src={`${imageUrl}${actor.profile_path}`} alt="profileImg" />
+                  </ActorProfileImg>
+                  <ActorProfileName>{actor.name}</ActorProfileName>
+                </ActorProfile>
+              );
+            })}
+          </ActorContainer>
+        </DetailDiv>
+        <DetailDiv>줄거리 : {movieContents}</DetailDiv>
       </DetailWrap>
       {movieDetailLoading && <Loading text="영화 목록을 불러오는 중입니다..." />}
     </DetailContainer>
@@ -105,7 +133,7 @@ export default Detail;
 // style
 const DetailContainer = styled.div`
   width: 100%;
-  height: calc(100vh - 202px);
+  height: calc(100vh - 302px);
   overflow: scroll;
   background-color: #2d8d79;
   padding: 101px 0;
@@ -145,7 +173,6 @@ const DetailWrap = styled.div`
 const DetailPoster = styled.div`
   width: 200px;
   height: 270px;
-  background-color: azure;
   margin: 0 auto 10px;
 
   & img {
@@ -156,8 +183,36 @@ const DetailPoster = styled.div`
 
 const DetailDiv = styled.div`
   width: 100%;
-  height: 25px;
-  margin-bottom: 10px;
+  overflow: hidden;
+  margin-bottom: 20px;
   line-height: 25px;
   color: #f8d49a;
+`;
+
+const ActorContainer = styled.div`
+  width: 100%;
+  height: 270px;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+`;
+
+const ActorProfile = styled.div`
+  width: 200px;
+  height: 270px;
+  position: relative;
+`;
+
+const ActorProfileImg = styled.div`
+  width: 100%;
+  height: 250px;
+  & img {
+    width: 100%;
+    height: 100%;
+  }
+`;
+
+const ActorProfileName = styled.div`
+  width: 100%;
+  height: 20px;
 `;

@@ -39,7 +39,7 @@ export const MovieDetailAPI = async (movieCd) => {
 export const PopularMovieAPI = async () => {
   const key = process.env.REACT_APP_TMDB_KEY;
   try {
-    const res = await axios.get(`https://api.themoviedb.org/3/movie/popular?api_key=${key}&page=1`);
+    const res = await axios.get(`https://api.themoviedb.org/3/movie/popular?api_key=${key}&page=1&language=ko-KR`);
 
     return res.data;
   } catch (e) {
@@ -56,7 +56,7 @@ export const DetailMovieAPI = async (movieId) => {
   const key = process.env.REACT_APP_TMDB_KEY;
 
   try {
-    const res = await axios.get(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${key}`);
+    const res = await axios.get(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${key}&language=ko-KR`);
     return res.data;
   } catch (e) {
     console.log(e);
@@ -71,7 +71,7 @@ export const DetailPersonAPI = async (movieId) => {
   const key = process.env.REACT_APP_TMDB_KEY;
 
   try {
-    const res = await axios.get(`https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=${key}`);
+    const res = await axios.get(`https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=${key}&language=ko-KR`);
     return res.data;
   } catch (e) {
     console.log(e);

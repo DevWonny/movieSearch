@@ -28,7 +28,7 @@ const MovieCard = (props) => {
         <Card.EtcDiv>제목 : {movieTitle && movieTitle}</Card.EtcDiv>
         <Card.EtcDiv>개봉일 : {props.el.release_date}</Card.EtcDiv>
         <Card.EtcDiv>평점 : {props.el.vote_average}</Card.EtcDiv>
-        <Card.EtcDiv>{props.el.overview.substr(0, 200) + '...'}</Card.EtcDiv>
+        <Card.EtcDiv>{props.el.overview.substr(0, 300)}</Card.EtcDiv>
         <div
           className="Detail"
           onClick={() => {
