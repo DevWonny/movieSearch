@@ -44,14 +44,17 @@ export const DetailPersonAPI = async (movieId) => {
 };
 
 // 검색 API
-export const SearchMovieAPI = async (movieTitle) => {
+export const SearchMovieAPI = async (movieTitle, currentPage) => {
   if (!movieTitle) {
+    return;
+  }
+  if (!currentPage) {
     return;
   }
 
   try {
     const res = await axios.get(
-      `https://api.themoviedb.org/3/search/movie?api_key=${key}&query=${movieTitle}&language=ko-KR`
+      `https://api.themoviedb.org/3/search/movie?api_key=${key}&query=${movieTitle}&language=ko-KR&page=${currentPage}`
     );
 
     return res.data;

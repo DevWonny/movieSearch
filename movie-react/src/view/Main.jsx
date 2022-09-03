@@ -24,13 +24,12 @@ const Main = () => {
   // 영화 제목
   const [movieTitle, setMovieTitle] = useState('');
 
-  // total contents
-  const [totalContents, setTotalContents] = useState(null);
   // total page
   const [totalPage, setTotalPage] = useState(null);
   // current page
   const [currentPage, setCurrentPage] = useState(1);
-
+  // search Current page
+  const [searchCurrentPage, setSearchCurrentPage] = useState(1);
   // main Container Ref
   const mainContainerRef = useRef();
 
@@ -41,12 +40,12 @@ const Main = () => {
   // 초기 인기순 api 호출
   const initPopularApi = async () => {
     setIsLoading(true);
-    const res = await PopularMovieAPI(currentPage);
+    const res = await PopularMovieAPI(1);
 
     if (res) {
       setTotalPage(res.total_pages);
-      setTotalContents(res.total_results);
       setMovieList(res.results);
+      mainContainerRef.current.scrollTop = 0;
     }
     setIsLoading(false);
   };
@@ -54,13 +53,12 @@ const Main = () => {
   // 검색 호출
   const getSearchMovieApi = async () => {
     setIsLoading(true);
-
-    const res = await SearchMovieAPI(movieTitle);
+    const res = await SearchMovieAPI(movieTitle, 1);
 
     if (res) {
       setTotalPage(res.total_pages);
-      setTotalContents(res.total_results);
       setMovieList(res.results);
+      mainContainerRef.current.scrollTop = 0;
     }
     setIsLoading(false);
   };
@@ -70,20 +68,30 @@ const Main = () => {
     setIsLoading(true);
 
     const res = await PopularMovieAPI(currentPage);
-    console.log(res);
     setMovieList((prev) => [...prev, ...res.results]);
 
     setIsLoading(false);
   };
 
   // 검색 한 상태에서 무한스크롤
-  // const getScrollSearchMovieApi = async() =>{}
+  const getScrollSearchMovieApi = async () => {
+    setIsLoading(true);
+
+    const res = await SearchMovieAPI(movieTitle, searchCurrentPage);
+
+    setMovieList((prev) => [...prev, ...res.results]);
+
+    setIsLoading(false);
+  };
 
   useEffect(() => {
     if (currentPage > 1 && !movieTitle) {
       getScrollMovieApi();
     }
-  }, [currentPage]);
+    if (searchCurrentPage > 1 && movieTitle) {
+      getScrollSearchMovieApi();
+    }
+  }, [currentPage, searchCurrentPage]);
 
   // 더보기 클릭 시 호출 api
   //   const moreMovieApi = async () => {
@@ -123,7 +131,17 @@ const Main = () => {
   const onIntersect = async ([entry], observer) => {
     if (entry.isIntersecting) {
       observer.unobserve(entry.target);
-      setCurrentPage(currentPage + 1);
+
+      if (!movieTitle) {
+        if (currentPage <= totalPage) {
+          setCurrentPage(currentPage + 1);
+        }
+      } else {
+        if (searchCurrentPage <= totalPage) {
+          setSearchCurrentPage(searchCurrentPage + 1);
+        }
+      }
+
       observer.observe(entry.target);
     }
   };
@@ -169,11 +187,24 @@ const Main = () => {
             }}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
+                setSearchCurrentPage(1);
                 getSearchMovieApi();
+
+                if (!movieTitle) {
+                  initPopularApi();
+                }
               }
             }}
           />
-          <SearchIconDiv>
+          <SearchIconDiv
+            onClick={() => {
+              if (!movieTitle) {
+                initPopularApi();
+              } else {
+                setSearchCurrentPage(1);
+                getSearchMovieApi();
+              }
+            }}>
             <img src={SearchIcon} alt="searchIcon" />
           </SearchIconDiv>
         </MainHeader>
