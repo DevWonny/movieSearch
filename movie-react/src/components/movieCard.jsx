@@ -89,7 +89,7 @@ const Card = {
   `,
 
   ContentContainer: styled.div`
-    width: 70%;
+    width: 80%;
     height: 100%;
     position: relative;
   `,
