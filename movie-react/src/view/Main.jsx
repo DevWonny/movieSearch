@@ -24,9 +24,6 @@ const Main = () => {
   // 영화 제목
   const [movieTitle, setMovieTitle] = useState('');
 
-  // movie start state
-  const [movieStart, setMovieStart] = useState(1);
-
   // total contents
   const [totalContents, setTotalContents] = useState(null);
   // total page
@@ -44,13 +41,12 @@ const Main = () => {
   // 초기 인기순 api 호출
   const initPopularApi = async () => {
     setIsLoading(true);
-    const res = await PopularMovieAPI();
+    const res = await PopularMovieAPI(currentPage);
 
     if (res) {
       setTotalPage(res.total_pages);
       setTotalContents(res.total_results);
       setMovieList(res.results);
-      console.log('res', res);
     }
     setIsLoading(false);
   };
@@ -68,6 +64,26 @@ const Main = () => {
     }
     setIsLoading(false);
   };
+
+  // 검색 안한 상태에서 무한 스크롤
+  const getScrollMovieApi = async () => {
+    setIsLoading(true);
+
+    const res = await PopularMovieAPI(currentPage);
+    console.log(res);
+    setMovieList((prev) => [...prev, ...res.results]);
+
+    setIsLoading(false);
+  };
+
+  // 검색 한 상태에서 무한스크롤
+  // const getScrollSearchMovieApi = async() =>{}
+
+  useEffect(() => {
+    if (currentPage > 1 && !movieTitle) {
+      getScrollMovieApi();
+    }
+  }, [currentPage]);
 
   // 더보기 클릭 시 호출 api
   //   const moreMovieApi = async () => {
@@ -104,25 +120,24 @@ const Main = () => {
   };
 
   // intersection
-  // const onIntersect = async ([entry], observer) => {
-  //   if (entry.isIntersecting) {
-  //     observer.unobserve(entry.target);
-  //     await paginationApi();
-  //     observer.observe(entry.target);
-  //   }
-  // };
+  const onIntersect = async ([entry], observer) => {
+    if (entry.isIntersecting) {
+      observer.unobserve(entry.target);
+      setCurrentPage(currentPage + 1);
+      observer.observe(entry.target);
+    }
+  };
 
-  // useEffect(() => {
-  //   let observer;
-  //   if (movieList.length === totalContents) return;
-  //   if (observeRef.current) {
-  //     observer = new IntersectionObserver(onIntersect, {
-  //       threshold: 0.4,
-  //     });
-  //     observer.observe(observeRef.current);
-  //   }
-  //   return () => observer && observer.disconnect();
-  // }, [observeRef.current, movieList]);
+  useEffect(() => {
+    let observer;
+    if (observeRef.current) {
+      observer = new IntersectionObserver(onIntersect, {
+        threshold: 0.4,
+      });
+      observer.observe(observeRef.current);
+    }
+    return () => observer && observer.disconnect();
+  }, [onIntersect]);
 
   // 더보기 활성화 시 활용
   // useEffect(() => {

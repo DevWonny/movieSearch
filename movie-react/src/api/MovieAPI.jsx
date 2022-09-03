@@ -1,10 +1,13 @@
 import axios from 'axios';
 const key = process.env.REACT_APP_TMDB_KEY;
 // 인기순 호출(메인 페이지 처음 들어 간 경우)
-export const PopularMovieAPI = async () => {
+export const PopularMovieAPI = async (currentPage) => {
+  if (!currentPage) {
+    return;
+  }
   try {
     const res = await axios.get(
-      `https://api.themoviedb.org/3/movie/popular?api_key=${key}&page=1&language=ko-KR&include_adult=false`
+      `https://api.themoviedb.org/3/movie/popular?api_key=${key}&page=${currentPage}&language=ko-KR&include_adult=false`
     );
 
     return res.data;
