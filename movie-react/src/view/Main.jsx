@@ -4,8 +4,7 @@ import styled from 'styled-components';
 
 import MovieCard from '../components/movieCard';
 
-import NaverMovieAPI from '../api/NaverMovieAPI';
-import { PopularMovieAPI } from '../api/MovieAPI';
+import { PopularMovieAPI, SearchMovieAPI } from '../api/MovieAPI';
 
 import SearchIcon from '../assets/icon/serachIcon.svg';
 import TopButton from '../components/common/TopButton';
@@ -44,34 +43,31 @@ const Main = () => {
   // api 호출
   // 초기 인기순 api 호출
   const initPopularApi = async () => {
+    setIsLoading(true);
     const res = await PopularMovieAPI();
 
     if (res) {
       setTotalPage(res.total_pages);
       setTotalContents(res.total_results);
       setMovieList(res.results);
-      // console.log('res', res);
+      console.log('res', res);
     }
+    setIsLoading(false);
   };
 
-  useEffect(() => {
-    initPopularApi();
-  }, []);
+  // 검색 호출
+  const getSearchMovieApi = async () => {
+    setIsLoading(true);
 
-  // 초기 검색 호출
-  // const initNaverMovieApi = async () => {
-  //   if (movieTitle) {
-  //     setIsLoading(true);
-  //     const res = await NaverMovieAPI({ query: movieTitle, start: movieStart });
+    const res = await SearchMovieAPI(movieTitle);
 
-  //     if (res) {
-  //       setTotalPage(Math.ceil(res.data.total / 10));
-  //       setTotalContents(res.data.total);
-  //       setMovieList(res.data.items);
-  //     }
-  //     setIsLoading(false);
-  //   }
-  // };
+    if (res) {
+      setTotalPage(res.total_pages);
+      setTotalContents(res.total_results);
+      setMovieList(res.results);
+    }
+    setIsLoading(false);
+  };
 
   // 더보기 클릭 시 호출 api
   //   const moreMovieApi = async () => {
@@ -139,6 +135,11 @@ const Main = () => {
   //     mainContainerRef.current.scrollTop= 0;
   // },[currentPage])
 
+  // 초기값 호출
+  useEffect(() => {
+    initPopularApi();
+  }, []);
+
   return (
     <>
       <MainContainer ref={mainContainerRef} className="scrollTop" onScroll={handler}>
@@ -151,11 +152,11 @@ const Main = () => {
             onChange={(e) => {
               setMovieTitle(e.target.value);
             }}
-            // onKeyDown={(e) => {
-            //   if (e.key === 'Enter') {
-            //     initNaverMovieApi();
-            //   }
-            // }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                getSearchMovieApi();
+              }
+            }}
           />
           <SearchIconDiv>
             <img src={SearchIcon} alt="searchIcon" />
@@ -227,14 +228,14 @@ const SearchInput = styled.input`
   width: 50%;
   height: 40px;
   padding: 0 10px;
-  color: #cee9b6;
+  color: #f8d49a;
   background-color: transparent;
   border: 1px solid #cee9b6;
   border-radius: 10px;
   outline: none;
 
   &::placeholder {
-    color: #cee9b6;
+    color: #f8d49a;
   }
 `;
 
