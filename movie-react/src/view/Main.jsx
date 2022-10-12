@@ -243,6 +243,7 @@ export default Main;
 
 // style
 const MainContainer = styled.div`
+  min-width: 1100px;
   width: 100%;
   height: calc(100vh - 202px);
   overflow: scroll;
@@ -259,6 +260,7 @@ const MainContainer = styled.div`
 const MainHeader = styled.div`
   position: fixed;
   top: 0;
+  min-width: 1100px;
   width: 100%;
   height: 100px;
   border-bottom: 1px solid #cee9b6;
@@ -271,6 +273,7 @@ const MainHeader = styled.div`
 `;
 
 const SearchInput = styled.input`
+  min-width: 50%;
   width: 50%;
   height: 40px;
   padding: 0 10px;

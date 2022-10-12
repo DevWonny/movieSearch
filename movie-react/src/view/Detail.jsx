@@ -125,7 +125,7 @@ const Detail = () => {
             })}
           </ActorContainer>
         </DetailDiv>
-        <DetailDiv>줄거리 : {movieContents}</DetailDiv>
+        <DetailDiv contents={true}>줄거리 : {movieContents}</DetailDiv>
       </DetailWrap>
       {(movieDetailLoading || movieDetailPersonLoading) && <Loading text="영화 정보를 불러오는 중입니다..." />}
     </DetailContainer>
@@ -136,6 +136,7 @@ export default Detail;
 
 // style
 const DetailContainer = styled.div`
+  min-width: 1100px;
   width: 100%;
   height: calc(100vh - 302px);
   overflow: scroll;
@@ -168,10 +169,11 @@ const BackButton = styled.button`
 `;
 
 const DetailWrap = styled.div`
+  min-width: 1100px;
   width: 80%;
   height: 95%;
   position: relative;
-  margin: 10px auto 0;
+  margin: 10px auto 300px;
 `;
 
 const DetailPoster = styled.div`
